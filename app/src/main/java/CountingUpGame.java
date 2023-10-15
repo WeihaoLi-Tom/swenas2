@@ -480,6 +480,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
     public CountingUpGame(Properties properties) {
         super(700, 700, 30);
         this.properties = properties;
+        this.dealer = new CardDealer(properties);
         isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
         thinkingTime = Integer.parseInt(properties.getProperty("thinkingTime", "200"));
         delayTime = Integer.parseInt(properties.getProperty("delayTime", "100"));
