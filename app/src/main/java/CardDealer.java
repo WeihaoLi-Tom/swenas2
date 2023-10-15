@@ -15,7 +15,9 @@ public class CardDealer {
     private final Deck deck = new Deck(Suit.values(), Rank.values(), "cover");
     private Properties properties;
 
-
+    public CardDealer(Properties properties){
+        this.properties= properties;
+    }
 
     public void dealingOut(Hand[] hands, int nbPlayers, int nbCardsPerPlayer) {
         Hand pack = deck.toHand(false);

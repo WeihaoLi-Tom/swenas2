@@ -27,7 +27,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
     }
 
-    public CardDealer dealer = new CardDealer();
+    public CardDealer dealer = new CardDealer(properties);
 
     private final String version = "1.0";
     public final int nbPlayers = 4;
