@@ -10,15 +10,14 @@ import java.util.stream.Collectors;
 
 public class CardDealer {
 
-    private final List<Cards> deck;
+
     private static final Random random = new Random();
     private final Deck deck = new Deck(Suit.values(), Rank.values(), "cover");
+    private Properties properties;
 
-    public CardDealer(List<Cards> deck) {
-        this.deck = deck;
-    }
 
-    private void dealingOut(Hand[] hands, int nbPlayers, int nbCardsPerPlayer) {
+
+    public void dealingOut(Hand[] hands, int nbPlayers, int nbCardsPerPlayer) {
         Hand pack = deck.toHand(false);
         int[] cardsDealtPerPlayer = new int[nbPlayers];
 
@@ -33,7 +32,7 @@ public class CardDealer {
                 if (initialCard.length() <= 1) {
                     continue;
                 }
-                Cards card = getCardFromList(pack.getCardList(), initialCard);
+                Card card = getCardFromList(pack.getCardList(), initialCard);
                 if (card != null) {
                     card.removeFromHand(false);
                     hands[i].insert(card, false);
@@ -45,7 +44,7 @@ public class CardDealer {
             int cardsToDealt = nbCardsPerPlayer - hands[i].getNumberOfCards();
             for (int j = 0; j < cardsToDealt; j++) {
                 if (pack.isEmpty()) return;
-                Cards dealt = randomCard(pack.getCardList());
+                Card dealt = randomCard(pack.getCardList());
                 dealt.removeFromHand(false);
                 hands[i].insert(dealt, false);
             }
@@ -57,12 +56,12 @@ public class CardDealer {
         return clazz.getEnumConstants()[x];
     }
 
-    public Cards randomCard(ArrayList<Cards> list) {
+    public Card randomCard(ArrayList<Card> list) {
         int x = random.nextInt(list.size());
         return list.get(x);
     }
 
-    public Cards getRandomCardOrSkip(ArrayList<Cards> list) {
+    public Card getRandomCardOrSkip(ArrayList<Card> list) {
         int isSkip = random.nextInt(2);
         if (isSkip == 1) {
             return null;
@@ -87,19 +86,19 @@ public class CardDealer {
     public Suit getSuitFromString(String cardName) {
         String suitString = cardName.substring(cardName.length() - 1);
 
-        for (Suit suit : Suit.values()) {  // 注意这里的修改
+        for (Suit suit : Suit.values()) {
             if (suit.getSuitShortHand().equals(suitString)) {
                 return suit;
             }
         }
-        return Suit.CLUBS;  // 注意这里的修改
+        return Suit.CLUBS;
     }
 
 
-    public Cards getCardFromList(List<Cards> cards, String cardName) {
+    public Card getCardFromList(List<Card> cards, String cardName) {
         Rank cardRank = getRankFromString(cardName);
         Suit cardSuit = getSuitFromString(cardName);
-        for (Cards card: cards) {
+        for (Card card: cards) {
             if (card.getSuit() == cardSuit && card.getRank() == cardRank) {
                 return card;
             }
