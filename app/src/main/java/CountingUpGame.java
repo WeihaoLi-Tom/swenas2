@@ -12,63 +12,14 @@ import java.util.stream.Collectors;
 @SuppressWarnings("serial")
 public class CountingUpGame extends CardGame implements GGKeyListener {
 
-    public enum Suit {
-        SPADES ("S"), HEARTS ("H"), DIAMONDS ("D"), CLUBS ("C");
-        private String suitShortHand = "";
-        Suit(String shortHand) {
-            this.suitShortHand = shortHand;
-        }
-
-        public String getSuitShortHand() {
-            return suitShortHand;
-        }
-    }
-
-    public enum Rank {
-        // Reverse order of rank importance (see rankGreater() below)
-        ACE (1, 10), KING (13, 10), QUEEN (12, 10),
-        JACK (11, 10), TEN (10, 10), NINE (9, 9),
-        EIGHT (8, 8), SEVEN (7, 7), SIX (6, 6),
-        FIVE (5, 5), FOUR (4, 4), THREE (3, 3),
-        TWO (2, 2);
-
-        private int rankCardValue = 1;
-        private int scoreCardValue = 1;
-        Rank(int rankCardValue, int scoreCardValue) {
-            this.rankCardValue = rankCardValue;
-            this.scoreCardValue = scoreCardValue;
-        }
-
-        public int getRankCardValue() {
-            return rankCardValue;
-        }
-
-        public int getScoreCardValue() { return scoreCardValue; }
-
-        public String getRankCardLog() {
-            return String.format("%d", rankCardValue);
-        }
-    }
-
-    final String trumpImage[] = {"bigspade.gif", "bigheart.gif", "bigdiamond.gif", "bigclub.gif"};
-
-    static public final int seed = 30008;
-    static final Random random = new Random(seed);
-    private Properties properties;
-    private StringBuilder logResult = new StringBuilder();
-    private List<List<String>> playerAutoMovements = new ArrayList<>();
-
-    public boolean rankGreater(Card card1, Card card2) {
-        return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
-    }
-
     private final String version = "1.0";
     public final int nbPlayers = 4;
     public final int nbStartCards = 13;
     public final int nbRounds = 3;
     private final int handWidth = 400;
     private final int trickWidth = 40;
-    private final Deck deck = new Deck(Suit.values(), Rank.values(), "cover");
+    private final Deck deck = new Deck(Cards.Suit.values(), Cards.Rank.values(), "cover");
+
     private final Location[] handLocations = {
             new Location(350, 625),
             new Location(75, 350),
@@ -112,19 +63,19 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         }
     }
 
-    private void calculateScoreEndOfRound(int player, List<Card> cardsPlayed) {
+    private void calculateScoreEndOfRound(int player, List<Cards> cardsPlayed) {
         int totalScorePlayed = 0;
-        for (Card card: cardsPlayed) {
-            Rank rank = (Rank) card.getRank();
+        for (Cards card: cardsPlayed) {
+            Rank rank = card.getRank();
             totalScorePlayed += rank.getScoreCardValue();
         }
         scores[player] += totalScorePlayed;
     }
 
-    private void calculateNegativeScoreEndOfGame(int player, List<Card> cardsInHand) {
+    private void calculateNegativeScoreEndOfGame(int player, List<Cards> cardsInHand) {
         int totalScorePlayed = 0;
-        for (Card card: cardsInHand) {
-            Rank rank = (Rank) card.getRank();
+        for (Cards card: cardsInHand) {
+            Rank rank = card.getRank();
             totalScorePlayed -= rank.getScoreCardValue();
         }
         scores[player] += totalScorePlayed;
@@ -149,7 +100,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         }
     }
 
-    private Card selected;
+    private Cards selected;
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
@@ -176,7 +127,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         // Set up human player for interaction
         CardListener cardListener = new CardAdapter()  // Human Player plays card
         {
-            public void leftDoubleClicked(Card card) {
+            public void leftDoubleClicked(Cards card) {
                 selected = card;
                 hands[0].setTouchEnabled(false);
             }
@@ -195,64 +146,15 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
     }
 
 
-    // return random Enum value
-    public static <T extends Enum<?>> T randomEnum(Class<T> clazz) {
-        int x = random.nextInt(clazz.getEnumConstants().length);
-        return clazz.getEnumConstants()[x];
-    }
 
-    // return random Card from ArrayList
-    public static Card randomCard(ArrayList<Card> list) {
-        int x = random.nextInt(list.size());
-        return list.get(x);
-    }
 
-    public static Card getRandomCardOrSkip(ArrayList<Card> list) {
-        int isSkip = random.nextInt(2);
-        if (isSkip == 1) {
-            return null;
-        }
 
-        int x = random.nextInt(list.size());
-        return list.get(x);
-    }
 
-    private Rank getRankFromString(String cardName) {
-        String rankString = cardName.substring(0, cardName.length() - 1);
-        Integer rankValue = Integer.parseInt(rankString);
 
-        for (Rank rank : Rank.values()) {
-            if (rank.getRankCardValue() == rankValue) {
-                return rank;
-            }
-        }
 
-        return Rank.ACE;
-    }
 
-    private Suit getSuitFromString(String cardName) {
-        String suitString = cardName.substring(cardName.length() - 1);
 
-        for (Suit suit : Suit.values()) {
-            if (suit.getSuitShortHand().equals(suitString)) {
-                return suit;
-            }
-        }
-        return Suit.CLUBS;
-    }
 
-    private Card getCardFromList(List<Card> cards, String cardName) {
-        Rank cardRank = getRankFromString(cardName);
-        Suit cardSuit = getSuitFromString(cardName);
-        for (Card card: cards) {
-            if (card.getSuit() == cardSuit
-                    && card.getRank() == cardRank) {
-                return card;
-            }
-        }
-
-        return null;
-    }
 
     private void dealingOut(Hand[] hands, int nbPlayers, int nbCardsPerPlayer) {
         Hand pack = deck.toHand(false);
@@ -269,7 +171,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
                 if (initialCard.length() <= 1) {
                     continue;
                 }
-                Card card = getCardFromList(pack.getCardList(), initialCard);
+                Cards card = getCardFromList(pack.getCardList(), initialCard);
                 if (card != null) {
                     card.removeFromHand(false);
                     hands[i].insert(card, false);
@@ -281,7 +183,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
             int cardsToDealt = nbCardsPerPlayer - hands[i].getNumberOfCards();
             for (int j = 0; j < cardsToDealt; j++) {
                 if (pack.isEmpty()) return;
-                Card dealt = randomCard(pack.getCardList());
+                Cards dealt = randomCard(pack.getCardList());
                 dealt.removeFromHand(false);
                 hands[i].insert(dealt, false);
             }
@@ -291,11 +193,11 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
     private int playerIndexWithAceClub() {
         for (int i = 0; i < nbPlayers; i++) {
             Hand hand = hands[i];
-            List<Card> cards = hand.getCardsWithRank(Rank.ACE);
+            List<Cards> cards = hand.getCardsWithRank(Rank.ACE);
             if (cards.size() == 0) {
                 continue;
             }
-            for (Card card: cards) {
+            for (Cards card: cards) {
                 if (card.getSuit() == Suit.CLUBS) {
                     return i;
                 }
@@ -305,7 +207,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         return 0;
     }
 
-    private void addCardPlayedToLog(int player, Card selectedCard) {
+    private void addCardPlayedToLog(int player, Cards selectedCard) {
         if (selectedCard == null) {
             logResult.append("P" + player + "-SKIP,");
         } else {
@@ -344,7 +246,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         for (int i = 0; i < nbPlayers; i++) updateScore(i);
         boolean isContinue = true;
         int skipCount = 0;
-        List<Card>cardsPlayed = new ArrayList<>();
+        List<Cards>cardsPlayed = new ArrayList<>();
         playingArea = new Hand(deck);
         addRoundInfoToLog(roundNumber);
 
