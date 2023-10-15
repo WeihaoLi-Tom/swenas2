@@ -12,6 +12,7 @@ public class CardDealer {
 
     private final List<Cards> deck;
     private static final Random random = new Random();
+    private final Deck deck = new Deck(Suit.values(), Rank.values(), "cover");
 
     public CardDealer(List<Cards> deck) {
         this.deck = deck;
