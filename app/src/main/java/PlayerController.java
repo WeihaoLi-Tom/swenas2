@@ -30,6 +30,10 @@ public class PlayerController implements GGKeyListener{
         }
         return false;
     }
+    public List<String> getPlayerMovement(int playerIndex) {
+        return playerAutoMovements.get(playerIndex);
+    }
+
 
 
     public boolean keyReleased(KeyEvent keyEvent) {

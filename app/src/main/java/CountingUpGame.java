@@ -21,7 +21,7 @@ public class CountingUpGame extends CardGame  {
     static final Random random = new Random(seed);
     private Properties properties;
     private StringBuilder logResult = new StringBuilder();
-    private List<List<String>> playerAutoMovements = new ArrayList<>();
+//    private List<List<String>> playerAutoMovements = new ArrayList<>();
 
     public boolean rankGreater(Card card1, Card card2) {
         return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
@@ -131,6 +131,7 @@ public class CountingUpGame extends CardGame  {
     }
 
     private void playGame() {
+
         // End trump suit
         Hand playingArea = null;
         int winner = 0;
@@ -148,7 +149,7 @@ public class CountingUpGame extends CardGame  {
             boolean finishedAuto = false;
             if (isAuto) {
                 int nextPlayerAutoIndex = autoIndexHands[nextPlayer];
-                List<String> nextPlayerMovement = playerAutoMovements.get(nextPlayer);
+                List<String> nextPlayerMovement = controller.getPlayerMovement(nextPlayer);
                 String nextMovement = "";
 
                 if (nextPlayerMovement.size() > nextPlayerAutoIndex) {
