@@ -169,7 +169,7 @@ public class CountingUpGame extends CardGame  {
                     delay(thinkingTime);
                     do {
                         selected = dealer.getRandomCardOrSkip(hands[nextPlayer].getCardList());
-                    } while (selected != null && !isValidCardToPlay(selected)); // 保证选择的牌是有效的
+                    } while (selected != null && !isValidCardToPlay(selected)); // Ensure the selected card is valid
 
                     if (selected == null) {
                         setStatusText("Player " + nextPlayer + " skipping...");
