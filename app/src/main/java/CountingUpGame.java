@@ -18,14 +18,12 @@ public class CountingUpGame extends CardGame  {
     final String trumpImage[] = {"bigspade.gif", "bigheart.gif", "bigdiamond.gif", "bigclub.gif"};
 
     static public final int seed = 30008;
-    static final Random random = new Random(seed);
+
     private Properties properties;
     private StringBuilder logResult = new StringBuilder();
 //    private List<List<String>> playerAutoMovements = new ArrayList<>();
 
-    public boolean rankGreater(Card card1, Card card2) {
-        return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
-    }
+
 // new in -----------------------------------------------------------------------------------------------------------------------
     public CardDealer dealer = new CardDealer(properties);
     public Logger logger = new Logger();
@@ -47,14 +45,8 @@ public class CountingUpGame extends CardGame  {
             new Location(350, 75),
             new Location(625, 350)
     };
-    private final Location[] scoreLocations = {
-            new Location(575, 675),
-            new Location(25, 575),
-            new Location(575, 25),
-            // new Location(650, 575)
-            new Location(575, 575)
-    };
-    private Actor[] scoreActors = {null, null, null, null};
+
+
     private final Location trickLocation = new Location(350, 350);
     private final Location textLocation = new Location(350, 450);
     private int thinkingTime = 2000;
@@ -72,9 +64,8 @@ public class CountingUpGame extends CardGame  {
     private boolean passSelected = false;
     private int[] autoIndexHands = new int [nbPlayers];
     private boolean isAuto = false;
-
-    Font bigFont = new Font("Arial", Font.BOLD, 36);
     private Card selected;
+    private Card lastPlayedCard = null;
 
 
 
@@ -129,8 +120,26 @@ public class CountingUpGame extends CardGame  {
 
         return 0;
     }
+    private boolean isRankGreater(Card card1, Card card2) {
+        Rank rank1 = (Rank) card1.getRank();
+        Rank rank2 = (Rank) card2.getRank();
+        return rank1.ordinal() > rank2.ordinal();
+    }
+
+    private boolean isValidCardToPlay(Card card) {
+        if (lastPlayedCard == null) return true; // 第一轮，任何牌都可以
+
+        if (card.getSuit() == lastPlayedCard.getSuit()) {
+            return isRankGreater(card, lastPlayedCard);
+        } else if (card.getRank() == lastPlayedCard.getRank()) {
+            return true;
+        }
+
+        return false;
+    }
 
     private void playGame() {
+
 
         // End trump suit
         Hand playingArea = null;
@@ -147,29 +156,25 @@ public class CountingUpGame extends CardGame  {
         while(isContinue) {
             selected = null;
             boolean finishedAuto = false;
-            if (isAuto) {
-                int nextPlayerAutoIndex = autoIndexHands[nextPlayer];
-                List<String> nextPlayerMovement = controller.getPlayerMovement(nextPlayer);
-                String nextMovement = "";
+            if (!isAuto || finishedAuto){
+                if (0 == nextPlayer) {
+                    hands[0].setTouchEnabled(true);
+                    isWaitingForPass = true;
+                    passSelected = false;
+                    setStatus("Player 0 double-click on card to follow or press Enter to pass");
+                    while (null == selected && !passSelected) delay(delayTime);
+                    isWaitingForPass = false;
+                } else {
+                    setStatusText("Player " + nextPlayer + " thinking...");
+                    delay(thinkingTime);
+                    do {
+                        selected = dealer.getRandomCardOrSkip(hands[nextPlayer].getCardList());
+                    } while (selected != null && !isValidCardToPlay(selected)); // 保证选择的牌是有效的
 
-                if (nextPlayerMovement.size() > nextPlayerAutoIndex) {
-                    nextMovement = nextPlayerMovement.get(nextPlayerAutoIndex);
-                    nextPlayerAutoIndex++;
-
-                    autoIndexHands[nextPlayer] = nextPlayerAutoIndex;
-                    Hand nextHand = hands[nextPlayer];
-
-                    if (nextMovement.equals("SKIP")) {
+                    if (selected == null) {
                         setStatusText("Player " + nextPlayer + " skipping...");
                         delay(thinkingTime);
-                        selected = null;
-                    } else {
-                        setStatusText("Player " + nextPlayer + " thinking...");
-                        delay(thinkingTime);
-                        selected = dealer.getCardFromList(nextHand.getCardList(), nextMovement);
                     }
-                } else {
-                    finishedAuto = true;
                 }
             }
 
@@ -198,6 +203,7 @@ public class CountingUpGame extends CardGame  {
             playingArea.draw();
             logger.addCardPlayedToLog(nextPlayer, selected);
             if (selected != null) {
+                lastPlayedCard = selected;
                 skipCount = 0;
                 cardsPlayed.add(selected);
                 selected.setVerso(false);  // In case it is upside down
