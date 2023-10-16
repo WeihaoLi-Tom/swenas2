@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
-public class CountingUpGame extends CardGame implements GGKeyListener {
+public class CountingUpGame extends CardGame  {
 
 
 
@@ -31,6 +31,8 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
     public Logger logger = new Logger();
 
     public Score score = new  Score(this);
+
+    public PlayerController controller = new PlayerController(this,properties);
 //new in-----------------------------------------------------------------------------------------------------------------------
     private final String version = "1.0";
     public final int nbPlayers = 4;
@@ -72,24 +74,13 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
     private boolean isAuto = false;
 
     Font bigFont = new Font("Arial", Font.BOLD, 36);
-
-
-
-
     private Card selected;
 
-    @Override
-    public boolean keyPressed(KeyEvent keyEvent) {
-        if (isWaitingForPass && keyEvent.getKeyChar() == '\n') {
-            passSelected = true;
-        }
-        return false;
-    }
 
-    @Override
-    public boolean keyReleased(KeyEvent keyEvent) {
-        return false;
-    }
+
+
+
+
 
     private void initGame() {
         hands = new Hand[nbPlayers];
@@ -252,43 +243,15 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         }
     }
 
-    private void setupPlayerAutoMovements() {
-        String player0AutoMovement = properties.getProperty("players.0.cardsPlayed");
-        String player1AutoMovement = properties.getProperty("players.1.cardsPlayed");
-        String player2AutoMovement = properties.getProperty("players.2.cardsPlayed");
-        String player3AutoMovement = properties.getProperty("players.3.cardsPlayed");
 
-        String[] playerMovements = new String[] {"", "", "", ""};
-        if (player0AutoMovement != null) {
-            playerMovements[0] = player0AutoMovement;
-        }
-
-        if (player1AutoMovement != null) {
-            playerMovements[1] = player1AutoMovement;
-        }
-
-        if (player2AutoMovement != null) {
-            playerMovements[2] = player2AutoMovement;
-        }
-
-        if (player3AutoMovement != null) {
-            playerMovements[3] = player3AutoMovement;
-        }
-
-        for (int i = 0; i < playerMovements.length; i++) {
-            String movementString = playerMovements[i];
-            List<String> movements = Arrays.asList(movementString.split(","));
-            playerAutoMovements.add(movements);
-        }
-    }
 
     public String runApp() {
         setTitle("CountingUpGame (V" + version + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
         setStatusText("Initializing...");
         score.initScores();
         score.initScore();
-        addKeyListener(this);
-        setupPlayerAutoMovements();
+        addKeyListener(controller);
+        controller.setupPlayerAutoMovements();
         initGame();
         playGame();
 
@@ -319,6 +282,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         this.dealer = new CardDealer(properties);
         this.logger = new Logger();
         this.score  = new Score(this);
+        this.controller=new PlayerController(this,properties);
         isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
         thinkingTime = Integer.parseInt(properties.getProperty("thinkingTime", "200"));
         delayTime = Integer.parseInt(properties.getProperty("delayTime", "100"));

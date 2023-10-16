@@ -21,15 +21,15 @@ public class Score {
     private Actor[] scoreActors = {null, null, null, null};
     private int[] scores = new int[nbPlayers];
 
-    private CardGame cardgame;
+    private CountingUpGame game;
 
     Font bigFont = new Font("Arial", Font.BOLD, 36);
 
 
 
 
-    public Score(CardGame cardgame) {
-        this.cardgame = cardgame;
+    public Score(CountingUpGame game) {
+        this.game = game;
     }
 
 
@@ -67,19 +67,19 @@ public class Score {
         for (int i = 0; i < nbPlayers; i++) {
             // scores[i] = 0;
             String text = "[" + String.valueOf(scores[i]) + "]";
-            scoreActors[i] = new TextActor(text, Color.WHITE, cardgame.bgColor, bigFont);
-            cardgame.addActor(scoreActors[i], scoreLocations[i]);
+            scoreActors[i] = new TextActor(text, Color.WHITE, game.bgColor, bigFont);
+            game.addActor(scoreActors[i], scoreLocations[i]);
         }
     }
 
 
 
     public void updateScore(int player) {
-        cardgame.removeActor(scoreActors[player]);
+        game.removeActor(scoreActors[player]);
         int displayScore = scores[player] >= 0 ? scores[player] : 0;
         String text = "P" + player + "[" + String.valueOf(displayScore) + "]";
-        scoreActors[player] = new TextActor(text, Color.WHITE, cardgame.bgColor, bigFont);
-        cardgame.addActor(scoreActors[player], scoreLocations[player]);
+        scoreActors[player] = new TextActor(text, Color.WHITE, game.bgColor, bigFont);
+        game.addActor(scoreActors[player], scoreLocations[player]);
     }
 
 
