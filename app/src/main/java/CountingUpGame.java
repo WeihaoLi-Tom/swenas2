@@ -82,23 +82,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         }
     }
 
-//    private void calculateScoreEndOfRound(int player, List<Card> cardsPlayed) {
-//        int totalScorePlayed = 0;
-//        for (Card card: cardsPlayed) {
-//            Rank rank = (Rank) card.getRank();
-//            totalScorePlayed += rank.getScoreCardValue();
-//        }
-//        scores[player] += totalScorePlayed;
-//    }
-//
-//    private void calculateNegativeScoreEndOfGame(int player, List<Card> cardsInHand) {
-//        int totalScorePlayed = 0;
-//        for (Card card: cardsInHand) {
-//            Rank rank = (Rank) card.getRank();
-//            totalScorePlayed -= rank.getScoreCardValue();
-//        }
-//        scores[player] += totalScorePlayed;
-//    }
+
 
     private void updateScore(int player) {
         removeActor(scoreActors[player]);
@@ -113,11 +97,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
             scores[i] = 0;
         }
     }
-//
-//    private void updateScores() {
-//        for (int i = 0; i < nbPlayers; i++) {
-//        }
-//    }
+
 
     private Card selected;
 

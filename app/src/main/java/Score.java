@@ -9,8 +9,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Score {
-    private int[] scores;
+
     public int nbPlayers =4;
+    private int[] scores = new int[nbPlayers];
+    public Score() {
+        initScores();
+    }
+
 
 
     public void calculateScoreEndOfRound(int player, List<Card> cardsPlayed) {
