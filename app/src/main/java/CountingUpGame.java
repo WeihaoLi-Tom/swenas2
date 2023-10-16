@@ -30,8 +30,8 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
     public CardDealer dealer = new CardDealer(properties);
     public Logger logger = new Logger();
 
-    public Score score = new Score();
-    // new in -----------------------------------------------------------------------------------------------------------------------
+    public Score score = new  Score(this);
+//new in-----------------------------------------------------------------------------------------------------------------------
     private final String version = "1.0";
     public final int nbPlayers = 4;
     public final int nbStartCards = 13;
@@ -73,30 +73,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
 
     Font bigFont = new Font("Arial", Font.BOLD, 36);
 
-    private void initScore() {
-        for (int i = 0; i < nbPlayers; i++) {
-            // scores[i] = 0;
-            String text = "[" + String.valueOf(scores[i]) + "]";
-            scoreActors[i] = new TextActor(text, Color.WHITE, bgColor, bigFont);
-            addActor(scoreActors[i], scoreLocations[i]);
-        }
-    }
 
-
-
-    private void updateScore(int player) {
-        removeActor(scoreActors[player]);
-        int displayScore = scores[player] >= 0 ? scores[player] : 0;
-        String text = "P" + player + "[" + String.valueOf(displayScore) + "]";
-        scoreActors[player] = new TextActor(text, Color.WHITE, bgColor, bigFont);
-        addActor(scoreActors[player], scoreLocations[player]);
-    }
-
-    private void initScores() {
-        for (int i = 0; i < nbPlayers; i++) {
-            scores[i] = 0;
-        }
-    }
 
 
     private Card selected;
@@ -167,7 +144,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         Hand playingArea = null;
         int winner = 0;
         int roundNumber = 1;
-        for (int i = 0; i < nbPlayers; i++) updateScore(i);
+        for (int i = 0; i < nbPlayers; i++) score.updateScore(i);
         boolean isContinue = true;
         int skipCount = 0;
         List<Card>cardsPlayed = new ArrayList<>();
@@ -248,7 +225,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
                 winner = (nextPlayer + 1) % nbPlayers;
                 skipCount = 0;
                 score.calculateScoreEndOfRound(winner, cardsPlayed);
-                updateScore(winner);
+                score.updateScore(winner);
                 logger.addEndOfRoundToLog();
                 roundNumber++;
                 logger.addRoundInfoToLog(roundNumber);
@@ -271,7 +248,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
 
         for (int i = 0; i < nbPlayers; i++) {
             score.calculateNegativeScoreEndOfGame(i, hands[i].getCardList());
-            updateScore(i);
+            score.updateScore(i);
         }
     }
 
@@ -308,14 +285,14 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
     public String runApp() {
         setTitle("CountingUpGame (V" + version + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
         setStatusText("Initializing...");
-        initScores();
-        initScore();
+        score.initScores();
+        score.initScore();
         addKeyListener(this);
         setupPlayerAutoMovements();
         initGame();
         playGame();
 
-        for (int i = 0; i < nbPlayers; i++) updateScore(i);
+        for (int i = 0; i < nbPlayers; i++) score.updateScore(i);
         int maxScore = 0;
         for (int i = 0; i < nbPlayers; i++) if (scores[i] > maxScore) maxScore = scores[i];
         List<Integer> winners = new ArrayList<Integer>();
@@ -341,7 +318,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         this.properties = properties;
         this.dealer = new CardDealer(properties);
         this.logger = new Logger();
-        this.score  = new Score();
+        this.score  = new Score(this);
         isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
         thinkingTime = Integer.parseInt(properties.getProperty("thinkingTime", "200"));
         delayTime = Integer.parseInt(properties.getProperty("delayTime", "100"));

@@ -9,13 +9,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Score {
+    private final Location[] scoreLocations = {
+            new Location(575, 675),
+            new Location(25, 575),
+            new Location(575, 25),
+            // new Location(650, 575)
+            new Location(575, 575)
+    };
 
     public int nbPlayers =4;
+    private Actor[] scoreActors = {null, null, null, null};
     private int[] scores = new int[nbPlayers];
-    public Score() {
-        initScores();
-    }
 
+    private CardGame cardgame;
+
+    Font bigFont = new Font("Arial", Font.BOLD, 36);
+
+
+
+
+    public Score(CardGame cardgame) {
+        this.cardgame = cardgame;
+    }
 
 
     public void calculateScoreEndOfRound(int player, List<Card> cardsPlayed) {
@@ -36,28 +51,38 @@ public class Score {
         scores[player] += totalScorePlayed;
     }
 
-    public int getScore(int player) {
-        return scores[player];
-    }
 
-    public void setScore(int player, int score) {
-        scores[player] = score;
-    }
-
-    public int[] getAllScores() {
-        return scores;
-    }
-
-    private void initScores() {
+    public void initScores() {
         for (int i = 0; i < nbPlayers; i++) {
             scores[i] = 0;
         }
     }
 
-    private void updateScores() {
+    public void updateScores() {
         for (int i = 0; i < nbPlayers; i++) {
         }
     }
+
+    public void initScore() {
+        for (int i = 0; i < nbPlayers; i++) {
+            // scores[i] = 0;
+            String text = "[" + String.valueOf(scores[i]) + "]";
+            scoreActors[i] = new TextActor(text, Color.WHITE, cardgame.bgColor, bigFont);
+            cardgame.addActor(scoreActors[i], scoreLocations[i]);
+        }
+    }
+
+
+
+    public void updateScore(int player) {
+        cardgame.removeActor(scoreActors[player]);
+        int displayScore = scores[player] >= 0 ? scores[player] : 0;
+        String text = "P" + player + "[" + String.valueOf(displayScore) + "]";
+        scoreActors[player] = new TextActor(text, Color.WHITE, cardgame.bgColor, bigFont);
+        cardgame.addActor(scoreActors[player], scoreLocations[player]);
+    }
+
+
 }
 
 
