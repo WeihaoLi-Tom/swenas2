@@ -83,13 +83,17 @@ public class CountingUpGame extends CardGame  {
             hands[i].sort(Hand.SortType.SUITPRIORITY, false);
         }
         // Set up human player for interaction
-        CardListener cardListener = new CardAdapter()  // Human Player plays card
-        {
+        CardListener cardListener = new CardAdapter() {
             public void leftDoubleClicked(Card card) {
-                selected = card;
-                hands[0].setTouchEnabled(false);
+                if (isValidCardToPlay(card)) {
+                    selected = card;
+                    hands[0].setTouchEnabled(false);
+                } else {
+                    setStatus("Invalid card. Please select a valid card to play.");
+                }
             }
         };
+
         hands[0].addCardListener(cardListener);
         // graphics
         RowLayout[] layouts = new RowLayout[nbPlayers];
@@ -120,14 +124,13 @@ public class CountingUpGame extends CardGame  {
 
         return 0;
     }
-    private boolean isRankGreater(Card card1, Card card2) {
-        Rank rank1 = (Rank) card1.getRank();
-        Rank rank2 = (Rank) card2.getRank();
-        return rank1.ordinal() > rank2.ordinal();
+    public boolean isRankGreater(Card card1, Card card2) {
+        return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
     }
 
+
     private boolean isValidCardToPlay(Card card) {
-        if (lastPlayedCard == null) return true; // 第一轮，任何牌都可以
+        if (lastPlayedCard == null) return true;
 
         if (card.getSuit() == lastPlayedCard.getSuit()) {
             return isRankGreater(card, lastPlayedCard);
