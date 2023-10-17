@@ -63,14 +63,7 @@ public class CardDealer {
         return list.get(x);
     }
 
-    public Card getRandomCardOrSkip(ArrayList<Card> list) {
-        int isSkip = random.nextInt(2);
-        if (isSkip == 1) {
-            return null;
-        }
-        int x = random.nextInt(list.size());
-        return list.get(x);
-    }
+
 
     public Rank getRankFromString(String cardName) {
         String rankString = cardName.substring(0, cardName.length() - 1);

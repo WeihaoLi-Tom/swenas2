@@ -142,6 +142,8 @@ public class CountingUpGame extends CardGame  {
     }
 
     private void playGame() {
+        boolean isFirstTurn = true;
+
 
 
         // End trump suit
@@ -159,6 +161,17 @@ public class CountingUpGame extends CardGame  {
         while(isContinue) {
             selected = null;
             boolean finishedAuto = false;
+            if (nextPlayer == playerIndexWithAceClub()&& isFirstTurn) {
+                selected = dealer.getCardFromList(hands[nextPlayer].getCardList(), "1C");
+                if (selected != null) {
+                    selected.transfer(playingArea, true);
+                    cardsPlayed.add(selected);
+                    isFirstTurn= false;
+                    continue;
+                }
+            }
+
+
             if (isAuto){
                 if (0 == nextPlayer) {
                     hands[0].setTouchEnabled(true);
@@ -171,7 +184,7 @@ public class CountingUpGame extends CardGame  {
                     setStatusText("Player " + nextPlayer + " thinking...");
                     delay(thinkingTime);
                     do {
-                        selected = dealer.getRandomCardOrSkip(hands[nextPlayer].getCardList());
+                        selected = controller.getRandomCardOrSkip(hands[nextPlayer].getCardList());
                     } while (selected != null && !isValidCardToPlay(selected)); // Ensure the selected card is valid
 
                     if (selected == null) {
@@ -192,7 +205,7 @@ public class CountingUpGame extends CardGame  {
                 } else {
                     setStatusText("Player " + nextPlayer + " thinking...");
                     delay(thinkingTime);
-                    selected = dealer.getRandomCardOrSkip(hands[nextPlayer].getCardList());
+                    selected = controller.getRandomCardOrSkip(hands[nextPlayer].getCardList());
                     if (selected == null) {
                         setStatusText("Player " + nextPlayer + " skipping...");
                         delay(thinkingTime);

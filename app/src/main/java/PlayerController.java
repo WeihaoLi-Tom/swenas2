@@ -13,6 +13,7 @@ public class PlayerController implements GGKeyListener{
     private CountingUpGame game;
     public boolean isWaitingForPass = true;
     public boolean passSelected = false;
+    private static final Random random = new Random();
     private Properties properties;
     private List<List<String>> playerAutoMovements = new ArrayList<>();
 
@@ -39,6 +40,14 @@ public class PlayerController implements GGKeyListener{
         return false;
     }
 
+    public Card getRandomCardOrSkip(ArrayList<Card> list) {
+        int isSkip = random.nextInt(2);
+        if (isSkip == 1) {
+            return null;
+        }
+        int x = random.nextInt(list.size());
+        return list.get(x);
+    }
 
 
 
