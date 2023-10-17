@@ -60,8 +60,8 @@ public class CountingUpGame extends CardGame  {
 
     private int[] scores = new int[nbPlayers];
 
-    private boolean isWaitingForPass = false;
-    private boolean passSelected = false;
+    public boolean isWaitingForPass = false;
+    public boolean passSelected = false;
     private int[] autoIndexHands = new int [nbPlayers];
     private boolean isAuto = false;
     private Card selected;
@@ -159,7 +159,7 @@ public class CountingUpGame extends CardGame  {
         while(isContinue) {
             selected = null;
             boolean finishedAuto = false;
-            if (!isAuto || finishedAuto){
+            if (isAuto){
                 if (0 == nextPlayer) {
                     hands[0].setTouchEnabled(true);
                     isWaitingForPass = true;
