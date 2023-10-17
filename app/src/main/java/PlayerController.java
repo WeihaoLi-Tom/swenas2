@@ -40,14 +40,6 @@ public class PlayerController implements GGKeyListener{
         return false;
     }
 
-    public Card getRandomCardOrSkip(ArrayList<Card> list) {
-        int isSkip = random.nextInt(2);
-        if (isSkip == 1) {
-            return null;
-        }
-        int x = random.nextInt(list.size());
-        return list.get(x);
-    }
 
 
 
@@ -82,6 +74,27 @@ public class PlayerController implements GGKeyListener{
             List<String> movements = Arrays.asList(movementString.split(","));
             playerAutoMovements.add(movements);
         }
+    }
+
+    public Card getRandomCardOrSkip(ArrayList<Card> list) {
+
+
+
+        ArrayList<Card> tempList = new ArrayList<>(list);
+
+        while (!tempList.isEmpty()) {
+            int x = random.nextInt(tempList.size());
+            Card selectedCard = tempList.get(x);
+
+            if (game.isValidCardToPlay(selectedCard)) {
+                return selectedCard;
+            } else {
+                tempList.remove(x);
+            }
+        }
+
+
+        return null;
     }
 
 

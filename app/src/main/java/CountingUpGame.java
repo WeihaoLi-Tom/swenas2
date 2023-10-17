@@ -129,7 +129,7 @@ public class CountingUpGame extends CardGame  {
     }
 
 
-    private boolean isValidCardToPlay(Card card) {
+    public boolean isValidCardToPlay(Card card) {
         if (lastPlayedCard == null) return true;
 
         if (card.getSuit() == lastPlayedCard.getSuit()) {
