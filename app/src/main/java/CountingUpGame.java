@@ -87,6 +87,7 @@ public class CountingUpGame extends CardGame  {
             public void leftDoubleClicked(Card card) {
                 if (isValidCardToPlay(card)) {
                     selected = card;
+
                     hands[0].setTouchEnabled(false);
                 } else {
                     setStatus("Invalid card. Please select a valid card to play.");
@@ -134,6 +135,7 @@ public class CountingUpGame extends CardGame  {
 
         if (card.getSuit() == lastPlayedCard.getSuit()) {
             return isRankGreater(card, lastPlayedCard);
+
         } else if (card.getRank() == lastPlayedCard.getRank()) {
             return true;
         }
@@ -161,15 +163,16 @@ public class CountingUpGame extends CardGame  {
         while(isContinue) {
             selected = null;
             boolean finishedAuto = false;
-            if (nextPlayer == playerIndexWithAceClub()&& isFirstTurn) {
+            if (nextPlayer == playerIndexWithAceClub() && isFirstTurn) {
                 selected = dealer.getCardFromList(hands[nextPlayer].getCardList(), "1C");
-                isFirstTurn= false;
-//                if (selected != null) {
-//                    selected.transfer(playingArea, true);
-//                    cardsPlayed.add(selected);
-//                    isFirstTurn= false;
-//                    continue;
-//                }
+                selected.transfer(playingArea, true);
+                cardsPlayed.add(selected);
+                isFirstTurn = false;
+                nextPlayer = (nextPlayer + 1) % nbPlayers;
+                lastPlayedCard=selected;
+
+                continue;
+
             }
 
 
