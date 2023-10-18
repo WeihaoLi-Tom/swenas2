@@ -26,10 +26,10 @@ public class CountingUpGame extends CardGame  {
 
 // new in -----------------------------------------------------------------------------------------------------------------------
     public CardDealer dealer = new CardDealer(properties);
-    public Logger logger = new Logger();
+
 
     public Score score = new  Score(this);
-
+    public Logger logger = new Logger(score);
     public PlayerController controller = new PlayerController(this,properties);
 //new in-----------------------------------------------------------------------------------------------------------------------
     private final String version = "1.0";
@@ -50,7 +50,7 @@ public class CountingUpGame extends CardGame  {
     private final Location trickLocation = new Location(350, 350);
     private final Location textLocation = new Location(350, 450);
     private int thinkingTime = 2000;
-    private int delayTime = 600;
+    private int delayTime = 0;
     private Hand[] hands;
     private Location hideLocation = new Location(-500, -500);
 
@@ -58,7 +58,7 @@ public class CountingUpGame extends CardGame  {
         setStatusText(string);
     }
 
-    private int[] scores = new int[nbPlayers];
+
 
     public boolean isWaitingForPass = false;
     public boolean passSelected = false;
@@ -261,6 +261,7 @@ public class CountingUpGame extends CardGame  {
                 score.calculateScoreEndOfRound(winner, cardsPlayed);
                 score.updateScore(winner);
                 logger.addEndOfRoundToLog();
+//                System.out.println(Arrays.toString(score.scores));
                 roundNumber++;
                 logger.addRoundInfoToLog(roundNumber);
                 cardsPlayed = new ArrayList<>();
@@ -273,6 +274,7 @@ public class CountingUpGame extends CardGame  {
             if (!isContinue) {
                 winner = nextPlayer;
                 score.calculateScoreEndOfRound(winner, cardsPlayed);
+//                System.out.println("score recorded!");
                 logger.addEndOfRoundToLog();
             } else {
                 nextPlayer = (nextPlayer + 1) % nbPlayers;
@@ -283,6 +285,7 @@ public class CountingUpGame extends CardGame  {
         for (int i = 0; i < nbPlayers; i++) {
             score.calculateNegativeScoreEndOfGame(i, hands[i].getCardList());
             score.updateScore(i);
+
         }
     }
 
@@ -300,9 +303,9 @@ public class CountingUpGame extends CardGame  {
 
         for (int i = 0; i < nbPlayers; i++) score.updateScore(i);
         int maxScore = 0;
-        for (int i = 0; i < nbPlayers; i++) if (scores[i] > maxScore) maxScore = scores[i];
+        for (int i = 0; i < nbPlayers; i++) if (score.scores[i] > maxScore) maxScore = score.scores[i];
         List<Integer> winners = new ArrayList<Integer>();
-        for (int i = 0; i < nbPlayers; i++) if (scores[i] == maxScore) winners.add(i);
+        for (int i = 0; i < nbPlayers; i++) if (score.scores[i] == maxScore) winners.add(i);
         String winText;
         if (winners.size() == 1) {
             winText = "Game over. Winner is player: " +
@@ -323,8 +326,9 @@ public class CountingUpGame extends CardGame  {
         super(700, 700, 30);
         this.properties = properties;
         this.dealer = new CardDealer(properties);
-        this.logger = new Logger();
+
         this.score  = new Score(this);
+        this.logger = new Logger(score);
         this.controller=new PlayerController(this,properties);
         isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
         thinkingTime = Integer.parseInt(properties.getProperty("thinkingTime", "200"));

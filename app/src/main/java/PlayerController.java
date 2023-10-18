@@ -27,11 +27,11 @@ public class PlayerController implements GGKeyListener{
 
 
     public boolean keyPressed(KeyEvent keyEvent) {
-        System.out.println("yes i press!");
-        System.out.println(game.isWaitingForPass);
+//        System.out.println("yes i press!");
+//        System.out.println(game.isWaitingForPass);
         if (isWaitingForPass && keyEvent.getKeyChar() == '\n') {
             game.passSelected = true;
-            System.out.println("yes i press!");
+//            System.out.println("yes i press!");
         }
         return false;
     }

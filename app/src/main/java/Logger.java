@@ -5,7 +5,13 @@ import java.util.stream.Collectors;
 
 public class Logger {
     public StringBuilder logResult = new StringBuilder();
-    private int[] scores = new int[4];
+    public Score score;
+
+
+    public Logger (Score score){
+        this.score = score;
+    }
+
 
     public void addCardPlayedToLog(int player, Card selectedCard) {
         if (selectedCard == null) {
@@ -23,16 +29,17 @@ public class Logger {
 
     public void addEndOfRoundToLog() {
         logResult.append("Score:");
-        for (int i = 0; i < scores.length; i++) {
-            logResult.append(scores[i] + ",");
+        for (int i = 0; i < score.scores.length; i++) {
+            logResult.append(score.scores[i] + ",");
         }
         logResult.append("\n");
+        System.out.println("addendrountolog");
     }
 
     public void addEndOfGameToLog(List<Integer> winners) {
         logResult.append("EndGame:");
-        for (int i = 0; i < scores.length; i++) {
-            logResult.append(scores[i] + ",");
+        for (int i = 0; i < score.scores.length; i++) {
+            logResult.append(score.scores[i] + ",");
         }
         logResult.append("\n");
         logResult.append("Winners:" + String.join(", ", winners.stream().map(String::valueOf).collect(Collectors.toList())));
