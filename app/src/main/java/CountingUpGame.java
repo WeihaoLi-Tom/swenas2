@@ -125,9 +125,20 @@ public class CountingUpGame extends CardGame  {
 
         return 0;
     }
+
     public boolean isRankGreater(Card card1, Card card2) {
-        return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
+        Enum rankEnum1 = card1.getRank();
+        Enum rankEnum2 = card2.getRank();
+
+        if (rankEnum1 instanceof Rank && rankEnum2 instanceof Rank) {
+            int rankValue1 = ((Rank) rankEnum1).getRankCardValue();
+            int rankValue2 = ((Rank) rankEnum2).getRankCardValue();
+            return rankValue1 > rankValue2;
+        }
+
+        return false;
     }
+
 
 
     public boolean isValidCardToPlay(Card card) {
