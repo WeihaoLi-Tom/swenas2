@@ -15,7 +15,7 @@ public class PlayerController implements GGKeyListener{
     public boolean passSelected = false;
     private static final Random random = new Random();
     private Properties properties;
-    private List<List<String>> playerAutoMovements = new ArrayList<>();
+    public List<List<String>> playerAutoMovements = new ArrayList<>();
 
     public PlayerController(CountingUpGame game, Properties properties) {
         this.game = game;
@@ -85,7 +85,7 @@ public class PlayerController implements GGKeyListener{
         while (!tempList.isEmpty()) {
             int x = random.nextInt(tempList.size());
             Card selectedCard = tempList.get(x);
-            System.out.println(selectedCard);
+//            System.out.println(selectedCard);
 
             if (game.isValidCardToPlay(selectedCard)) {
                 return selectedCard;

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Logger {
-    private StringBuilder logResult = new StringBuilder();
+    public StringBuilder logResult = new StringBuilder();
     private int[] scores = new int[4];
 
     public void addCardPlayedToLog(int player, Card selectedCard) {
