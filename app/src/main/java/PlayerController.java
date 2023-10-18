@@ -85,6 +85,7 @@ public class PlayerController implements GGKeyListener{
         while (!tempList.isEmpty()) {
             int x = random.nextInt(tempList.size());
             Card selectedCard = tempList.get(x);
+//            System.out.println(selectedCard);
 
             if (game.isValidCardToPlay(selectedCard)) {
                 return selectedCard;
