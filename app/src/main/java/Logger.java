@@ -33,7 +33,7 @@ public class Logger {
             logResult.append(score.scores[i] + ",");
         }
         logResult.append("\n");
-        System.out.println("addendrountolog");
+//        System.out.println("addendrountolog");
     }
 
     public void addEndOfGameToLog(List<Integer> winners) {

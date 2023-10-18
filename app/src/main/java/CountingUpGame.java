@@ -174,17 +174,7 @@ public class CountingUpGame extends CardGame  {
         while(isContinue) {
             selected = null;
             boolean finishedAuto = false;
-            if (nextPlayer == playerIndexWithAceClub() && isFirstTurn) {
-                selected = dealer.getCardFromList(hands[nextPlayer].getCardList(), "1C");
-                selected.transfer(playingArea, true);
-                cardsPlayed.add(selected);
-                isFirstTurn = false;
-                nextPlayer = (nextPlayer + 1) % nbPlayers;
-                lastPlayedCard=selected;
 
-                continue;
-
-            }
 
 
             if (isAuto) {
@@ -207,6 +197,9 @@ public class CountingUpGame extends CardGame  {
                         setStatusText("Player " + nextPlayer + " thinking...");
                         delay(thinkingTime);
                         selected = dealer.getCardFromList(nextHand.getCardList(), nextMovement);
+                        while (selected != null && !isValidCardToPlay(selected)) {
+                            selected=null;
+                        }
                     }
                 } else {
                     finishedAuto = true;
@@ -214,6 +207,17 @@ public class CountingUpGame extends CardGame  {
             }
 
             if (!isAuto || finishedAuto){
+                if (nextPlayer == playerIndexWithAceClub() && isFirstTurn) {
+                    selected = dealer.getCardFromList(hands[nextPlayer].getCardList(), "1C");
+                    selected.transfer(playingArea, true);
+                    cardsPlayed.add(selected);
+                    isFirstTurn = false;
+                    nextPlayer = (nextPlayer + 1) % nbPlayers;
+                    lastPlayedCard=selected;
+
+                    continue;
+
+                }
                 if (0 == nextPlayer) {
                     hands[0].setTouchEnabled(true);
                     isWaitingForPass = true;
@@ -261,7 +265,7 @@ public class CountingUpGame extends CardGame  {
                 score.calculateScoreEndOfRound(winner, cardsPlayed);
                 score.updateScore(winner);
                 logger.addEndOfRoundToLog();
-//                System.out.println(Arrays.toString(score.scores));
+                System.out.println(Arrays.toString(score.scores));
                 roundNumber++;
                 logger.addRoundInfoToLog(roundNumber);
                 cardsPlayed = new ArrayList<>();
@@ -274,7 +278,7 @@ public class CountingUpGame extends CardGame  {
             if (!isContinue) {
                 winner = nextPlayer;
                 score.calculateScoreEndOfRound(winner, cardsPlayed);
-//                System.out.println("score recorded!");
+                System.out.println(Arrays.toString(score.scores));
                 logger.addEndOfRoundToLog();
             } else {
                 nextPlayer = (nextPlayer + 1) % nbPlayers;
