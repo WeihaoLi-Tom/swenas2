@@ -163,12 +163,8 @@ public class CountingUpGame extends CardGame  {
             boolean finishedAuto = false;
             if (nextPlayer == playerIndexWithAceClub()&& isFirstTurn) {
                 selected = dealer.getCardFromList(hands[nextPlayer].getCardList(), "1C");
-                if (selected != null) {
-                    selected.transfer(playingArea, true);
-                    cardsPlayed.add(selected);
-                    isFirstTurn= false;
-                    continue;
-                }
+                isFirstTurn= false;
+
             }
 
 
