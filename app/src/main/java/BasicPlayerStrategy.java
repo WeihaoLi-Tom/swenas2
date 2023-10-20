@@ -42,4 +42,5 @@ public class BasicPlayerStrategy implements IPlayerStrategy {
 
         return selectedCard;
     }
+
 }

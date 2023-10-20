@@ -20,11 +20,11 @@ public class PlayerController implements GGKeyListener {
     }
 
     public boolean keyPressed(KeyEvent keyEvent) {
-        System.out.println("yes i press!");
-        System.out.println(CountingUpGame.Instance().isWaitingForPass);
+//        System.out.println("yes i press!");
+//        System.out.println(CountingUpGame.Instance().isWaitingForPass);
         if (CountingUpGame.Instance().isWaitingForPass && keyEvent.getKeyChar() == '\n') {
             CountingUpGame.Instance().passSelected = true;
-            System.out.println("yes i press!");
+//            System.out.println("yes i press!");
         }
         return false;
     }

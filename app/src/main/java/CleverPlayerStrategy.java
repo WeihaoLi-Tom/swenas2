@@ -1,21 +1,93 @@
 import ch.aplu.jcardgame.Card;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import ch.aplu.jcardgame.Hand;
 
 public class CleverPlayerStrategy implements IPlayerStrategy, IObserver {
-    private static final int DEPTH_LIMIT = 3;
-    HashMap<Player, ArrayList<Card>> cardsMemory = new HashMap<>();
+    private static final int DEPTH_LIMIT = 5;
+    private HashMap<Player, ArrayList<Card>> cardsMemory = new HashMap<>();
 
     CleverPlayerStrategy() {
         CountingUpGame.Instance().addObserver(this);
     }
+    private Rank getCurrentHighestRank(HashMap<Player, ArrayList<Card>> cardsMemory, Player cleverPlayer) {
+
+        int[] rankCounts = new int[Rank.values().length];
+
+        // First, count all cards in the memory
+        for (Player player : cardsMemory.keySet()) {
+            ArrayList<Card> cards = cardsMemory.get(player);
+            for (Card card : cards) {
+                if (card != null) {
+                    rankCounts[((Rank) card.getRank()).ordinal()]++;
+                }
+            }
+        }
+
+        // Then, add the cards from the clever player's hand to the count
+        if (cleverPlayer != null && cleverPlayer.getPlayerType() == Player.PlayerType.CLEVER) {
+            List<Card> cleverCards = cleverPlayer.hand.getCardList();
+            for (Card card : cleverCards) {
+                rankCounts[((Rank) card.getRank()).ordinal()]++;
+            }
+        }
+
+        Rank highestRank = null;
+        int highestValue = Integer.MIN_VALUE;
+        for (Rank rank : Rank.values()) {
+            int rankValue = rank.getRankCardValue();
+            if (rankCounts[rank.ordinal()] < 4 && rankValue > highestValue) {
+                highestValue = rankValue;
+                highestRank = rank;
+            }
+        }
+        System.out.println(highestRank);
+        return highestRank;
+    }
+
+
+
+
+    private Rank getHighestRankInHand(List<Card> hand) {
+        int highestValue = Integer.MIN_VALUE;
+        Rank highestRank = null;
+        for (Card card : hand) {
+            Rank rank = (Rank) card.getRank();
+            int rankValue = rank.getRankCardValue();
+            if (rankValue > highestValue) {
+                highestValue = rankValue;
+                highestRank = rank;
+            }
+        }
+        return highestRank;
+    }
+
+
+    private boolean isOnlyPlayerWithHighestRankCard(Card card, HashMap<Player, ArrayList<Card>> cardsMemory) {
+//        System.out.println("Checking if " + card + " is the only card of its rank played by any player.");
+
+        for (Player player : cardsMemory.keySet()) {
+//            System.out.println("Player: " + player + " has played: " + cardsMemory.get(player));
+            for (Card otherCard : cardsMemory.get(player)) {
+                if (otherCard != null && otherCard.getRank().equals(card.getRank())) {
+//                    System.out.println("Player: " + player + " has already played a card of rank: " + otherCard.getRank());
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
 
     @Override
     public Card PickCardToPlay(Player p) {
         List<Card> hand = new ArrayList<>(p.hand.getCardList());
+        Rank highestRankInHand = getHighestRankInHand(hand);
+        Rank currentHighestRankOnField = getCurrentHighestRank(cardsMemory,p);
+
         double bestScore = Double.NEGATIVE_INFINITY;
         Card bestCard = null;
 
@@ -25,43 +97,69 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver {
         while (iterator.hasNext()) {
             Card card = iterator.next();
             if (card == null) {
-                iterator.remove();  // 使用迭代器的 remove 方法删除元素
+                iterator.remove();
             }
         }
+
         for (Card card : hand) {
             if (!ValidationFacade.getInstance().isValidCardToPlay(card)) {
                 continue;
             }
+
+            if (card.getRank().equals(highestRankInHand) && highestRankInHand.getRankCardValue() <= currentHighestRankOnField.getRankCardValue()) {
+                continue;
+            }
+
             List<Card> simulatedHand = new ArrayList<>(hand);
             simulatedHand.remove(card);
-            List<Card> simulatedPlayedCards = new ArrayList<>(mergedList);  // assuming getLastPlayedCards() gives us a history
+            List<Card> simulatedPlayedCards = new ArrayList<>(mergedList);
             simulatedPlayedCards.add(card);
-            double currentScore = minimax(DEPTH_LIMIT, false, simulatedHand, simulatedPlayedCards);
-
+            double currentScore;
+            if (card.getRank().equals(getCurrentHighestRank(cardsMemory,p)) && isOnlyPlayerWithHighestRankCard(card, cardsMemory)) {
+                currentScore = minimax(DEPTH_LIMIT, false, simulatedHand, simulatedPlayedCards, mergedList, cardsMemory,p) + 100;
+            } else {
+                currentScore = minimax(DEPTH_LIMIT, false, simulatedHand, simulatedPlayedCards, mergedList, cardsMemory,p);
+            }
             if (currentScore > bestScore) {
                 bestScore = currentScore;
                 bestCard = card;
             }
         }
+
         return bestCard;
     }
 
-    private double minimax(int depth, boolean isMaximizingPlayer, List<Card> hand, List<Card> playedCards) {
+    private double minimax(int depth, boolean isMaximizingPlayer, List<Card> hand, List<Card> playedCards, List<Card> mergedList, HashMap<Player, ArrayList<Card>> cardsMemory, Player p) {
         if (depth == 0) {
             return evaluateHandScore(hand);
         }
 
+        Rank currentHighestRank = getCurrentHighestRank(cardsMemory,p);
+
         if (isMaximizingPlayer) {
             double maxEval = Double.NEGATIVE_INFINITY;
             for (Card card : hand) {
-                List<Card> newHand = new ArrayList<>(hand);
-                newHand.remove(card);
-                List<Card> newPlayedCards = new ArrayList<>(playedCards);
-                newPlayedCards.add(card);
-                double eval = minimax(depth - 1, false, newHand, newPlayedCards);
-                maxEval = Math.max(maxEval, eval);
+                if (ValidationFacade.getInstance().isValidCardToPlay(card)) {
+                    List<Card> newHand = new ArrayList<>(hand);
+                    newHand.remove(card);
+                    List<Card> newPlayedCards = new ArrayList<>(playedCards);
+                    newPlayedCards.add(card);
+                    double eval;
+                    if (card.getRank().equals(currentHighestRank) && isOnlyPlayerWithHighestRankCard(card, cardsMemory)) {
+                        eval = minimax(depth - 1, false, newHand, newPlayedCards, mergedList, cardsMemory,p) + 0;
+                    } else {
+                        eval = minimax(depth - 1, false, newHand, newPlayedCards, mergedList, cardsMemory,p);
+                    }
+                    maxEval = Math.max(maxEval, eval);
+                }
             }
+
+            if (maxEval == Double.NEGATIVE_INFINITY) {
+                return -1000;
+            }
+
             return maxEval;
+
         } else {
             double minEval = Double.POSITIVE_INFINITY;
             for (Card card : hand) {
@@ -69,7 +167,7 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver {
                 newHand.remove(card);
                 List<Card> newPlayedCards = new ArrayList<>(playedCards);
                 newPlayedCards.add(card);
-                double eval = minimax(depth - 1, true, newHand, newPlayedCards);
+                double eval = minimax(depth - 1, true, newHand, newPlayedCards, mergedList, cardsMemory,p);
                 minEval = Math.min(minEval, eval);
             }
             return minEval;
@@ -85,43 +183,13 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver {
     }
 
     private double evaluateCardScore(Card card, List<Card> hand) {
-//        double score = 0.0;
-//
-//        // 基于牌的点数调整分数
-//        int cardValue = card.getRank().getRankCardValue();
-//        if (cardValue <= 10) {
-//            score -= cardValue;
-//        } else {
-//            score -= 10;
-//        }
-//
-//        Suit cardSuit = (Suit) card.getSuit();
-//        int countSameSuitPlayed = (int) playedCards.stream().filter(c -> c.getSuit() == cardSuit).count();
-//        score += countSameSuitPlayed * 0.5;
-//
-//
-//        int highValueCards = (int) hand.stream().filter(c -> c.getValue() > 8 || c.getValue() == 1).count();  // 1 for Ace, and values > 8 for 10, J, Q, K
-//        if (highValueCards > 3) {
-//            score += 2.0;
-//        }
-//
-//        return score;
         double score = 0;
-
         if (((Rank) card.getRank()).getRankCardValue() >= 10 || ((Rank) card.getRank()).getRankCardValue() == 1) {
             score += 10;
         } else {
             score += ((Rank) card.getRank()).getRankCardValue();
         }
 
-//        for (Player player : cardsMemory.keySet()) {
-//            ArrayList<Card> playedByPlayer = cardsMemory.get(player);
-//            for (Card playedCard : playedByPlayer) {
-//                if (playedCard.getSuit() == card.getSuit()) {
-//                    score += 0.5;
-//                }
-//            }
-//        }
         ArrayList<Card> mergedList = new ArrayList<>();
         for (List<Card> l : cardsMemory.values()) mergedList.addAll(l);
 
@@ -129,7 +197,7 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver {
         while (iterator.hasNext()) {
             Card cardx = iterator.next();
             if (cardx == null) {
-                iterator.remove();  // 使用迭代器的 remove 方法删除元素
+                iterator.remove();
             }
         }
 
@@ -149,12 +217,6 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver {
             cardsMemory.put(CountingUpGame.Instance().getNextPlayer(), new ArrayList<Card>());
             cardsMemory.get(CountingUpGame.Instance().getNextPlayer()).add(CountingUpGame.Instance().getSelectedCard());
         }
-
-//        System.out.println("tongji" + Runtime.getRuntime());
-//        for (Player p : cardsMemory.keySet()) {
-//            System.out.println("Player: " + p.getPlayerType());
-//            System.out.println("Cards: " + cardsMemory.get(p));
-//            System.out.println();
-//        }
     }
 }
+
