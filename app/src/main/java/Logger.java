@@ -8,7 +8,7 @@ public class Logger {
     public Score score;
 
 
-    public Logger (Score score){
+    public Logger(Score score) {
         this.score = score;
     }
 
@@ -44,8 +44,6 @@ public class Logger {
         logResult.append("\n");
         logResult.append("Winners:" + String.join(", ", winners.stream().map(String::valueOf).collect(Collectors.toList())));
     }
-
-
 
 
 }
