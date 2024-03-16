@@ -16,7 +16,7 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver {
 
         int[] rankCounts = new int[Rank.values().length];
 
-        // First, count all cards in the memory
+
         for (Player player : cardsMemory.keySet()) {
             ArrayList<Card> cards = cardsMemory.get(player);
             for (Card card : cards) {
@@ -26,7 +26,7 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver {
             }
         }
 
-        // Then, add the cards from the clever player's hand to the count
+
         if (cleverPlayer != null && cleverPlayer.getPlayerType() == Player.PlayerType.CLEVER) {
             List<Card> cleverCards = cleverPlayer.hand.getCardList();
             for (Card card : cleverCards) {
